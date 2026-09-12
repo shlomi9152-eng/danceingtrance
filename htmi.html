@@ -1,0 +1,100 @@
+```html
+<!DOCTYPE html>
+<html lang="he">
+<head>
+  <meta charset="UTF-8" />
+  <title>Sound</title>
+
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+      background: black;
+      overflow: hidden;
+    }
+
+    #muteBtn {
+      position: fixed;
+      top: 10px;
+      left: 50%;
+      transform: translateX(-50%);
+      padding: 10px 20px;
+      font-size: 18px;
+      background: rgba(0,0,0,0.5);
+      border: none;
+      border-radius: 8px;
+      color: white;
+      cursor: pointer;
+      z-index: 10;
+    }
+
+    #ipBox {
+      position: fixed;
+      top: 80%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: black;
+      color: white;
+      padding: 20px 30px;
+      border-radius: 12px;
+      font-size: 20px;
+      font-family: Arial, sans-serif;
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- MP3 בלבד - לא מוצג על המסך -->
+  <audio id="audio" autoplay>
+    <source src="sound.mp3" type="audio/mpeg">
+    הדפדפן שלך לא תומך באודיו.
+  </audio>
+
+  <button id="muteBtn">🔊</button>
+
+  <div id="ipBox">תופסים מידע</div>
+
+  <script>
+    const audio = document.getElementById('audio');
+    const muteBtn = document.getElementById('muteBtn');
+    const ipBox = document.getElementById('ipBox');
+
+    audio.muted = false;
+
+    function tryPlay() {
+      const playPromise = audio.play();
+
+      if (playPromise !== undefined) {
+        playPromise.catch(() => {
+          console.warn('הדפדפן חסם הפעלה אוטומטית של הסאונד');
+          audio.muted = true;
+          audio.play();
+        });
+      }
+    }
+
+    muteBtn.addEventListener('click', () => {
+      audio.muted = !audio.muted;
+      muteBtn.textContent = audio.muted ? '🔇' : '🔊';
+    });
+
+    window.addEventListener('load', () => {
+      tryPlay();
+    });
+
+    fetch('https://api.ipify.org?format=json')
+      .then(response => response.json())
+      .then(data => {
+        ipBox.textContent = `האייפי שלך: ${data.ip}`;
+      })
+      .catch(() => {
+        ipBox.textContent = 'לא ניתן לקבל IP';
+      });
+  </script>
+
+</body>
+</html>
+```
